@@ -1,11 +1,23 @@
 const priceChecker = require('./PriceHTTPReciver');
 const express = require('express');
 const session = require('express-session');
+const { EasyDiscord, DiscordBot } = require ('./discordtoolkit/index.js');
 const http = require('http');
 const app = express();
 const fs = require('fs');
 
 const port = 2137
+
+const discord = new EasyDiscord({
+    id: '802531955681001492',
+    secret: 'XR_S19EqUQsoyyo1MTdqqIiponcbROk4'
+  }, 'https://mbd.jcx.pl:2137/auth');
+  const bot = new DiscordBot();
+  const botConfig = {
+    token: 'ODAyNTMxOTU1NjgxMDAxNDky.YAwmIA.0xNqEjJ_xn5JZdQXbWGsyf3aCJo',
+    guild: '797316268998787072',
+    role: '802531099909029928'
+  }
 
 var responseInvterval;
 
@@ -13,15 +25,56 @@ const server = http.createServer(app);
 server.listen(port, '127.0.0.1');
 console.log('Listening on port ' + port + '...');
 
-app.get('/', (req, res) =>
+app.use(session(
 {
-    GetFile('index.html', res, 'text/html');
+    secret: 'no',
+    resave: false,
+    saveUninitialized: false
+}));
+
+app.get('/', (req, res) => {
+    req.session.dauth = false;
+    res.end(`Discord auth loading!!`);
+});
+
+app.get('/discord', (req, res) => {
+    req.session.dauth = true;
+    discord.request(req, res);
+});
+
+app.get('/auth', async function (req, res) {
+    if (req.session.dauth) {
+        req.session.dresult = await discord.response(req);
+        res.redirect("/page");
+    } else res.redirect("/");
+});
+
+app.get('/page', async (req, res) =>
+{
+    if (req.session.dauth) {
+        const result = req.session.dresult;
+        if (!result.result) res.redirect('/error');
+        else {
+            const isAuth = await bot.hasUserRole(botConfig.guild, result.object.id, botConfig.role);
+            if (isAuth) response = GetFile('index.html', res, 'text/html');
+            else res.end('Fuck off!');
+        }
+    } 
+    else res.redirect("/");
 })
 
-app.get('/index.html', (req, res) =>
-{
-    GetFile('index.html', res, 'text/html');
-})
+app.get('/error', (req, res) => {
+    if (req.session.dauth) {
+        const result = req.session.dresult;
+        var response;
+        if (result.cancel_by_user) response = "Cancel by user (pog)"
+        else if (result.invalid_state) response = "CSRF";
+        else if (result.no_code) response = "Invalid request";
+        else if (result.auth) response = `AUTH: ${result.object}`;
+        else response = `Internal: ${result.object}`;
+        res.end(response);
+    } else res.redirect("/");
+  });
 
 app.get('/styles.css', (req, res) =>
 {

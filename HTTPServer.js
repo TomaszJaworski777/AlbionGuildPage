@@ -1,25 +1,26 @@
-const priceChecker = require('./PriceHTTPReciver');
 const express = require('express');
 const session = require('express-session');
-const { EasyDiscord, DiscordBot } = require ('./discordtoolkit/index.js');
 const http = require('http');
 const app = express();
 const fs = require('fs');
 
 const port = 2137
 
+var responseInvterval;
+
+const { EasyDiscord, DiscordBot } = require ('./discordtoolkit/index.js');
 const discord = new EasyDiscord({
     id: '802531955681001492',
-    secret: 'XR_S19EqUQsoyyo1MTdqqIiponcbROk4'
+    secret: GetConfigSecret()
   }, 'https://mbd.jcx.pl:2137/auth');
-  const bot = new DiscordBot();
-  const botConfig = {
-    token: 'ODAyNTMxOTU1NjgxMDAxNDky.YAwmIA.0xNqEjJ_xn5JZdQXbWGsyf3aCJo',
+const botConfig = {
+    token: GetConfigToken(),
     guild: '797316268998787072',
     role: '802531099909029928'
-  }
+}
 
-var responseInvterval;
+const bot = new DiscordBot();
+bot.start(botConfig.token);
 
 const server = http.createServer(app);
 server.listen(port, '127.0.0.1');
@@ -34,7 +35,7 @@ app.use(session(
 
 app.get('/', (req, res) => {
     req.session.dauth = false;
-    res.end(`Discord auth loading!!`);
+    GetFile('AuthRedirect.html', res, 'text/html');
 });
 
 app.get('/discord', (req, res) => {
@@ -122,6 +123,16 @@ function PrintSite(data, res, fileType)
     res.end(data);
 }
 
+function GetConfigSecret()
+{
+    return fs.readFileSync(__dirname + '/secret.config', 'utf-8');
+}
+
+function GetConfigToken()
+{
+    return fs.readFileSync(__dirname + '/token.config', 'utf-8');
+}
+
 function ServerRequest(req, res)
 {
     var body = "";
@@ -130,40 +141,10 @@ function ServerRequest(req, res)
     });
 
     req.on("end", function(){
-        priceChecker.clear();
-        var splitted = SplitBody(body);
-        priceChecker.getPrice(splitted[0], splitted[1], splitted[2]);
-        responseInvterval = setInterval(function() { EndPriceRecive(res); }, 250);
-    });             
-}
+        const item = body;
 
-function SplitBody(body)
-{
-    var splitted = ['', '', ''];
-    var index = 0;
-
-    for(var i = 0; i < body.length; i++)
-    {
-        if(body[i] === ',')
-        {
-            index++
-            continue;
-        }
-        
-        splitted[index] += body[i];
-    }
-
-    return splitted;
-}
-
-function EndPriceRecive(res)
-{
-    if(priceChecker.getPriceList().length > 0)
-    {
-        var priceList = priceChecker.getPriceList();
-        var string = JSON.stringify(priceList[0]);
+        const itemJson = fs.readFileSync(__dirname + '/itmes/' + item + '.item')
         res.writeHead(200);
-        res.end(String(string));
-        clearInterval(responseInvterval);
-    }   
+        res.end(itemJson);
+    });             
 }

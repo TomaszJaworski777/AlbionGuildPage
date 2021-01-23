@@ -8,6 +8,7 @@ var currentItemName = '1st Place Statue - Season 10';
 var currentItemID = 'UNIQUE_FURNITUREITEM_GVG_SEASON_10_1ST';
 
 var sending = false;
+var recivingIndex = 0;
 
 const cities = ['Martlock', 'Bridgewatch', 'Lymhurst', 'Thetford', 'Fort Sterling', 'Caerleon', 'BlackMarket', 'ArthursRest']
 
@@ -33,41 +34,47 @@ function InitializeElements()
     }
 }
 
-function SendRequest(cityIndex)
+function SendRequest()
 {
     ChangeSendingState(true);
 
     var req = new XMLHttpRequest();
-    SendData(req, cities[cityIndex]);
-    ReciveData(req, cityIndex);
+    Send(req, currentItemID);
+    ReciveData(req);
 }
 
-function ReciveData(req, cityIndex)
+function ReciveData(req)
 {
     req.onreadystatechange = event => {
         if(req.readyState === 4 && req.status === 200)
         {
-            ReturningValue(req, cityIndex);
+            const returnedText = req.responseText;
+            const json = JSON.parse(returnedText);
 
-            if(cityIndex < cities.length - 1)
+            ResetStoreDataArray();
+            recivingIndex=0;
+
+            for(var i = 0; i < json.length; i++)
             {
-                SendRequest(++cityIndex);
+                const data = json[i];
+                if(data.quality == qualitySelection.value && data.sell_price_min > 0)
+                {
+                    returnStore[recivingIndex] = data.city + ': ' + data.sell_price_min + ' ===> ' + GetDateString(data.sell_price_min_date);
+                    recivingIndex++;
+                }
             }
-            else
-            {
-                RecivingDone();
-            }
+
+            PrintResults();
         }
     }
 }
 
-function ReturningValue(req, cityIndex)
+function ResetStoreDataArray()
 {
-    var returnedText = req.responseText;
-    var json = JSON.parse(returnedText);
-
-    if(json.sell_price_min != 0)
-        returnStore[cityIndex] = json.city + ': ' + json.sell_price_min + ' ===> ' + GetDateString(json.sell_price_min_date);
+    for(var i = 0; i < returnStore.length; i++)
+    {
+        returnStore[i] = '';
+    }
 }
 
 function GetDateString(date)
@@ -92,7 +99,7 @@ function GetDateString(date)
     return result;
 }
 
-function RecivingDone()
+function PrintResults()
 {
     ChangeSendingState(false);
 
@@ -100,15 +107,6 @@ function RecivingDone()
     {
         returnedValue[i].textContent = returnStore[i]; 
     }
-}
-
-function SendData(req, location)
-{
-    var ID = currentItemID;
-    var quality = qualitySelection.value;
-
-    var arrayToSend = [ID, location, quality];
-    Send(req, arrayToSend);
 }
 
 function Send(req, data)
@@ -121,6 +119,7 @@ function ChangeSendingState(isSending)
 {
     sending = isSending;
     sendButton.disabled = isSending;
+    qualitySelection.disabled = isSending;
 }
 
 function FilterFunction() 

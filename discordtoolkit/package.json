@@ -1,0 +1,22 @@
+{
+  "name": "discordtoolkit",
+  "version": "1.0.0",
+  "description": "Simple toolkit for interactions with Discord",
+  "main": "index.js",
+  "dependencies": {
+    "bufferutil": "^4.0.3",
+    "discord.js": "^12.5.1",
+    "erlpack": "^0.1.3",
+    "express": "^4.17.1",
+    "express-session": "^1.17.1",
+    "simple-oauth2": "^4.2.0",
+    "utf-8-validate": "^5.0.4",
+    "zlib-sync": "^0.1.7"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Kantraksel",
+  "license": "AGPL-3.0-or-later"
+}

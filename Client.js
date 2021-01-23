@@ -3,6 +3,7 @@ var returnedValue = [];
 var returnStore = [];
 var searchingBar;
 var sendButton;
+var itemImage;
 
 var currentItemName = '1st Place Statue - Season 10';
 var currentItemID = 'UNIQUE_FURNITUREITEM_GVG_SEASON_10_1ST';
@@ -27,6 +28,7 @@ function InitializeElements()
     qualitySelection = document.getElementById('quality');
     searchingBar = document.getElementById('itemNameSearch');
     sendButton = document.getElementById('SendData');
+    itemImage = document.getElementById('itemImage');
 
     for(var i = 0; i < 8; i++)
     {
@@ -171,14 +173,7 @@ function ChangeItem(itemName, itemID)
 
 function LoadNewImage()
 {
-    var canvas = document.getElementById("itemCanvas");
-    var context = canvas.getContext("2d");
-
-    var img = new Image();
-    img.onload = function() {
-    context.drawImage(img, 0, 0);
-    };
-    img.src = 'https://render.albiononline.com/v1/item/' + currentItemID.toUpperCase() + '.png';
+    itemImage.src = 'https://render.albiononline.com/v1/item/' + currentItemID.toUpperCase() + '.png?quality=' + qualitySelection.value;
 }
 
 function ShowSearchingTab()
@@ -189,4 +184,9 @@ function ShowSearchingTab()
         dir.style.display = 'none';
     else
         dir.style.display = 'block';
+}
+
+function QualityChanged()
+{
+    LoadNewImage();
 }

@@ -8,8 +8,7 @@
     <link href="styles.css" rel="stylesheet" type="text/css">
 </head>
 <body> 
-    <canvas id="itemCanvas" onClick = "ShowSearchingTab();" width="217" height="217">
-        Your browser does not support the HTML canvas tag.</canvas>
+    <img src="" onclick="ShowSearchingTab();" id='itemImage' width='217' height="217">
     <div id="itemNameDropdown" class="dropdown-itemName">
         <input type="text" placeholder="1st Place Statue - Season 10" id="itemNameSearch" onkeyup="FilterFunction()" autocomplete="off">
         <div id="itemNameContainer" class="dropdown-itemContainer">
@@ -7327,7 +7326,7 @@
         </div>
     </div><br><br><br>
     <label for="quality">Quality:</label>
-    <select id = "quality">
+    <select onChange="QualityChanged();" id = "quality">
         <option value = '1'>Normal</option>
         <option value = '2'>Good</option>
         <option value = '3'>Outstanding</option>

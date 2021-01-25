@@ -1,4 +1,3 @@
-const request  = require('request');
 const fs = require('fs');
 
 const itemList = 
@@ -7316,10 +7315,11 @@ const itemList =
     "SKIN_GIANTSTAG_XMAS"
 ]
 
+var file = fs.createWriteStream(__dirname  + "/trades.data");
 var tradeList = [];
 var iteration = 0;
 
-FindAllRoutes();    
+setInterval(FindAllRoutes, 5000);
 
 function FindAllRoutes()
 {
@@ -7403,9 +7403,9 @@ function FindAllRoutes()
     var time = new Date();
     var ratio = new Date().getTime() - time.getTime();
 
-    while(ratio < 5000) {ratio = new Date().getTime() - time.getTime();}
-
-    FindAllRoutes();
+    const jsonArray = JSON.stringify(tradeList);
+    
+    file.write(jsonArray);
 }
 
 function GetFile(itemID)

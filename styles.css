@@ -1,3 +1,9 @@
+body {
+    background-image: url('background.jpg');
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+}
+
 #itemNameSearch {
     box-sizing: border-box;
     background-position: 14px 12px;

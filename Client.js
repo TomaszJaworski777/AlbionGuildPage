@@ -56,6 +56,8 @@ function ReciveData(req)
             ResetStoreDataArray();
             recivingIndex=0;
 
+            var itemCounts = 0;
+
             for(var i = 0; i < json.length; i++)
             {
                 const data = json[i];
@@ -63,8 +65,12 @@ function ReciveData(req)
                 {
                     returnStore[recivingIndex] = data.city + ': ' + data.sell_price_min + ' ===> ' + GetDateString(data.sell_price_min_date);
                     recivingIndex++;
+                    itemCounts++;
                 }
             }
+
+            if(itemCounts === 0)
+                returnStore[recivingIndex] = 'No data found';
 
             PrintResults();
         }

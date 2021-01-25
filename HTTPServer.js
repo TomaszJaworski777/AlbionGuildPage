@@ -46,11 +46,11 @@ app.get('/discord', (req, res) => {
 app.get('/auth', async function (req, res) {
     if (req.session.dauth) {
         req.session.dresult = await discord.response(req);
-        res.redirect("/page");
+        res.redirect("/prices");
     } else res.redirect("/");
 });
 
-app.get('/page', async (req, res) =>
+app.get('/prices', async (req, res) =>
 {
     if (req.session.dauth) {
         const result = req.session.dresult;
@@ -85,6 +85,11 @@ app.get('/styles.css', (req, res) =>
 app.get('/Client.js', (req, res) =>
 {
     GetFile('Client.js', res, '');
+})
+
+app.get('/background.jpg', (req, res) =>
+{
+    GetFile('background.jpg', res, '');
 })
 
 app.post('/price', (req, res) =>
@@ -143,7 +148,7 @@ function ServerRequest(req, res)
     req.on("end", function(){
         const item = body;
 
-        const itemJson = fs.readFileSync(__dirname + '/itmes/' + item + '.item')
+        const itemJson = fs.readFileSync(__dirname + '/items/' + item + '.item')
         res.writeHead(200);
         res.end(itemJson);
     });             
